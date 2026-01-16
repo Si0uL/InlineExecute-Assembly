@@ -29,6 +29,8 @@ This tool wouldn't exist without being able to piggyback off some really great r
 
 ### Build Your Own
 
+#### MSVC version (original)
+
 Run the below command inside the src directory via x64 Native Tools Command Prompt for VS 2019
 ```
 cl.exe /c inlineExecute-Assembly.c /GS- /FoinlineExecute-Assemblyx64.o
@@ -36,6 +38,12 @@ cl.exe /c inlineExecute-Assembly.c /GS- /FoinlineExecute-Assemblyx64.o
 Run the below command inside the src directory via x86 Native Tools Command Prompt for VS 2019
 ```
 cl.exe /c inlineExecute-Assembly.c /GS- /FoinlineExecute-Assemblyx86.o
+```
+
+#### GCC / mingw version
+
+```sh
+x86_64-w64-mingw32-gcc -c src/inlineExecute-Assembly.c -o src/inlineExecute-Assembly.x64.o
 ```
 
 ### Flags
