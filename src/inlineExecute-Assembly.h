@@ -1,10 +1,31 @@
 #pragma once
 #include <windows.h>
 
+/* ---------- Minimal SAL fallback shims for MinGW/GCC (avoid MSVC-only annotations) ---------- */
+#ifndef _In_NLS_string_
+#define _In_NLS_string_(x)
+#endif
+
+#ifndef _Frees_ptr_opt_
+#define _Frees_ptr_opt_
+#endif
+
+#ifndef __out_ecount_full_opt
+#define __out_ecount_full_opt(x)
+#endif
+
+#ifndef _Out_writes_opt_
+#define _Out_writes_opt_(x)
+#endif
+
+#ifndef _Inout_opt_
+#define _Inout_opt_
+#endif
+
 /*BOF Defs*/
 #define intAlloc(size) KERNEL32$HeapAlloc(KERNEL32$GetProcessHeap(), HEAP_ZERO_MEMORY, size)
 
-//MSVCRT
+//MSVCRT - note: SAL annotations removed or guarded above so these typedefs parse with GCC
 WINBASEAPI void* WINAPI MSVCRT$malloc(SIZE_T);
 WINBASEAPI void* __cdecl MSVCRT$memcpy(void* __restrict _Dst, const void* __restrict _Src, size_t _MaxCount);
 WINBASEAPI void __cdecl MSVCRT$memset(void* dest, int c, size_t count);
@@ -12,6 +33,10 @@ WINBASEAPI int __cdecl MSVCRT$strcmp(const char* _Str1, const char* _Str2);
 WINBASEAPI SIZE_T WINAPI MSVCRT$strlen(const char* str);
 WINBASEAPI int __cdecl MSVCRT$_snprintf(char* s, size_t n, const char* fmt, ...);
 WINBASEAPI errno_t __cdecl MSVCRT$mbstowcs_s(size_t* pReturnValue, wchar_t* wcstr, size_t sizeInWords, const char* mbstr, size_t count);
+#ifndef _MSC_VER
+/* Remove MSVC SAL annotation from typedef for portability */
+typedef int (WINAPI* _WideCharToMultiByte)(UINT CodePage, DWORD dwFlags, LPCWCH lpWideCharStr, int cchWideChar, LPSTR lpMultiByteStr, int cbMultiByte, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar);
+#endif
 WINBASEAPI size_t __cdecl MSVCRT$wcslen(const wchar_t *_Str);
 WINBASEAPI char* WINAPI MSVCRT$_strlwr(char * str);
 WINBASEAPI char* WINAPI MSVCRT$strrchr(char * str);
@@ -93,12 +118,14 @@ GUID        xIID_IUnknown;
 GUID        xIID_IDispatch;
 
 //GUID required to load .NET assemblies
+#ifdef _MSC_VER
 GUID        xCLSID_CLRMetaHost;
 GUID        xIID_ICLRMetaHost;
 GUID        xIID_ICLRRuntimeInfo;
 GUID        xCLSID_CorRuntimeHost;
 GUID        xIID_ICorRuntimeHost;
 GUID        xIID_AppDomain;
+#endif
 
 typedef struct _ICLRMetaHost            ICLRMetaHost;
 typedef struct _ICLRRuntimeInfo         ICLRRuntimeInfo;
@@ -979,3 +1006,4 @@ typedef struct IDebuggerThreadControlVtbl
 typedef struct _IDebuggerThreadControl {
     IDebuggerThreadControlVtbl* lpVtbl;
 } IDebuggerThreadControl;
+
